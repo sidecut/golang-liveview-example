@@ -101,6 +101,7 @@ func main() {
 
 	// This serves the JS needed to make live work.
 	http.Handle("/live.js", live.Javascript{})
+	http.Handle("/auto.js.map", live.JavascriptMap{})
 
 	http.ListenAndServe(":8080", nil)
 }
