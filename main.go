@@ -9,7 +9,7 @@ import (
 	"io"
 	"net/http"
 
-	. "github.com/jfyne/live"
+	"github.com/jfyne/live"
 )
 
 // Model of our thermostat.
@@ -18,7 +18,7 @@ type ThermoModel struct {
 }
 
 // Helper function to get the model from the socket data.
-func NewThermoModel(s Socket) *ThermoModel {
+func NewThermoModel(s live.Socket) *ThermoModel {
 	m, ok := s.Assigns().(*ThermoModel)
 	// If we haven't already initialised set up.
 	if !ok {
@@ -31,7 +31,7 @@ func NewThermoModel(s Socket) *ThermoModel {
 
 // thermoMount initialises the thermostat state. Data returned in the mount function will
 // automatically be assigned to the socket.
-func thermoMount(ctx context.Context, s Socket) (interface{}, error) {
+func thermoMount(ctx context.Context, s live.Socket) (interface{}, error) {
 	return NewThermoModel(s), nil
 }
 
@@ -39,14 +39,14 @@ func thermoMount(ctx context.Context, s Socket) (interface{}, error) {
 // is called with the original request context of the socket, the socket itself containing the current
 // state and and params that came from the event. Params contain query string parameters and any
 // `live-value-` bindings.
-func tempUp(ctx context.Context, s Socket, p Params) (interface{}, error) {
+func tempUp(ctx context.Context, s live.Socket, p live.Params) (interface{}, error) {
 	model := NewThermoModel(s)
 	model.C += 0.1
 	return model, nil
 }
 
 // tempDown on the temp down event, decrease the thermostat temperature by .1 C.
-func tempDown(ctx context.Context, s Socket, p Params) (interface{}, error) {
+func tempDown(ctx context.Context, s live.Socket, p live.Params) (interface{}, error) {
 	model := NewThermoModel(s)
 	model.C -= 0.1
 	return model, nil
@@ -57,7 +57,7 @@ func tempDown(ctx context.Context, s Socket, p Params) (interface{}, error) {
 func main() {
 
 	// Setup the handler.
-	h := NewHandler()
+	h := live.NewHandler()
 
 	// Mount function is called on initial HTTP load and then initial web
 	// socket connection. This should be used to create the initial state,
@@ -67,7 +67,7 @@ func main() {
 
 	// Provide a render function. Here we are doing it manually, but there is a
 	// provided WithTemplateRenderer which can be used to work with `html/template`
-	h.HandleRender(func(ctx context.Context, data *RenderContext) (io.Reader, error) {
+	h.HandleRender(func(ctx context.Context, data *live.RenderContext) (io.Reader, error) {
 		tmpl, err := template.New("thermo").Parse(`
             <div>{{.Assigns.C}}</div>
             <button live-click="temp-up">+</button>
@@ -94,10 +94,10 @@ func main() {
 	// This handles the `live-click="temp-down"` button.
 	h.HandleEvent("temp-down", tempDown)
 
-	http.Handle("/thermostat", NewHttpHandler(NewCookieStore("session-name", []byte("weak-secret")), h))
+	http.Handle("/thermostat", live.NewHttpHandler(live.NewCookieStore("session-name", []byte("weak-secret")), h))
 
 	// This serves the JS needed to make live work.
-	http.Handle("/live.js", Javascript{})
+	http.Handle("/live.js", live.Javascript{})
 
 	http.ListenAndServe(":8080", nil)
 }
