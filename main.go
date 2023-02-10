@@ -8,6 +8,8 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+
+	"github.com/jfyne/live"
 )
 
 // Model of our thermostat.
