@@ -7,6 +7,7 @@ import (
 	"context"
 	"html/template"
 	"io"
+	"math"
 	"net/http"
 
 	"github.com/jfyne/live"
@@ -42,6 +43,7 @@ func thermoMount(ctx context.Context, s live.Socket) (interface{}, error) {
 func tempUp(ctx context.Context, s live.Socket, p live.Params) (interface{}, error) {
 	model := NewThermoModel(s)
 	model.C += 0.1
+	model.C = float32(math.Round(float64(10*model.C)) / 10)
 	return model, nil
 }
 
@@ -49,6 +51,7 @@ func tempUp(ctx context.Context, s live.Socket, p live.Params) (interface{}, err
 func tempDown(ctx context.Context, s live.Socket, p live.Params) (interface{}, error) {
 	model := NewThermoModel(s)
 	model.C -= 0.1
+	model.C = float32(math.Round(float64(10*model.C)) / 10)
 	return model, nil
 }
 
