@@ -1,6 +1,6 @@
 // Example from https://github.com/jfyne/live
 
-package live
+package main
 
 import (
 	"bytes"
