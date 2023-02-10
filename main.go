@@ -54,7 +54,7 @@ func tempDown(ctx context.Context, s Socket, p Params) (interface{}, error) {
 
 // Example shows a simple temperature control using the
 // "live-click" event.
-func Example() {
+func main() {
 
 	// Setup the handler.
 	h := NewHandler()
